@@ -1,0 +1,4 @@
+[0m[[0m[31merror[0m] [0m[0mD:\solutions\ScalaSangria\src\main\scala\com\howtographql\scala\sangria\GraphSchema.scala:46:29: Can't find suitable `HasId` type-class instance for type `com.howtographql.scala.sangria.DBSchema.LinksTable#TableElementType`. If you have defined it already, please consider defining an implicit instance `HasId[com.howtographql.scala.sangria.DBSchema.LinksTable#TableElementType]`.[0m
+[0m[[0m[31merror[0m] [0m[0mError occurred in an application involving default arguments.[0m
+[0m[[0m[31merror[0m] [0m[0m  val linksFetcher = Fetcher([0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
