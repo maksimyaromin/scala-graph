@@ -4,14 +4,14 @@ import spray.json.{JsObject, JsString, JsValue}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import sangria.parser.QueryParser
 import sangria.ast.Document
 import sangria.marshalling.sprayJson._
-import sangria.execution._
+import sangria.execution.{ExceptionHandler => EHandler, _}
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext
+import models._
 
 object GraphServer {
   private val dao = DBSchema.createDatabase
@@ -35,6 +35,11 @@ object GraphServer {
     }
   }
 
+  val ErrorHandler = EHandler {
+    case (_, AuthenticationException(message)) => HandledException(message)
+    case (_, AuthorizationException(message)) => HandledException(message)
+  }
+
   private def executeGraphQuery(query: Document, operation: Option[String], vars: JsObject)
                                (implicit ec: ExecutionContext) = {
     Executor.execute(
@@ -43,7 +48,9 @@ object GraphServer {
       MyContext(dao),
       variables = vars,
       operationName = operation,
-      deferredResolver = GraphSchema.Resolver
+      deferredResolver = GraphSchema.Resolver,
+      exceptionHandler = ErrorHandler,
+      middleware = AuthMiddleware :: Nil
     )
       .map(OK -> _)
       .recover {
